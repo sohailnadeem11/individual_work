@@ -87,11 +87,23 @@
                 <p>Phone Number: {{order.phoneNumber}}</p>
 
                 <button v-on:click="checkoutValidation()":disabled="checkoutform"> Checkout</button>
-
-                <!-- <button v-on:click="submitForm">Checkout</button>
-
-                <button :disabled="!formvalidity">Checkout</button> -->
-
+                
+                <div id="productInCart">
+             
+                    <div v-for="product in this.cart" id="cart">
+                     
+                      <figure>
+                        <img v-bind:src="product.image"  style="height:80px"/>
+                      </figure>
+                     <p>{{product.subject}}</p>
+                     <p>{{product.location}}</p>
+                     <p>{{product.price}}</p>
+                     
+                      
+                      <button v-on:click = "cartremove(product.id,product.subject)">Delete</button>
+                     
+    
+                    </div>
             </div>
         </main>
     </div>
@@ -108,6 +120,7 @@
                 searchValue: '',
                
                 cart: [],
+                cartitem:[],
                
                 order: {
                     firstName: '',
@@ -118,12 +131,15 @@
 
             methods: {
                 addToCart(product) {
-                    this.cart.push(product.id);
+                    this.cart.push({subject: product.subject,
+                    price: product.price,location: product.location,image: product.image,availableInventory: product.availableInventory}),
+
+                    this.cartitem.push(product.id),
                     product.space = product.space - 1;
-                    // console.log('adding to cart', product.id)
+                    product.availableInventory = product.availableInventory -1;
+
                 },
                 showCheckout() {
-                    // console.log(this.showProduct);
                     this.showProduct = this.showProduct ? false : true;
                 },
                 submitForm() {
@@ -132,6 +148,12 @@
                 canAddToCart(product) {
                     return product.availableInventory > this.cartCount(product.id);
                 },
+                cartremove(id,subject)
+          {
+              this.cart.splice(this.cart.indexOf(id),1);
+              this.cartitem.splice(this.cartitem.indexOf(id),1);
+              products[products.indexOf(products.find(o=> o.subject ===subject))].space+=1;
+          },
                 cartCount(id) {
                     let count = 0;
                     for (let i = 0; i < this.cart.length; i++) {
@@ -242,9 +264,6 @@
                 checkoutVal: function(){
         return this.cartItemCount > 0 ? false : true;
             },
-        //     checkoutform: function(){
-        // return this.checkoutValidation > 0 ? false : true;
-        //     },
        },
 });
 
